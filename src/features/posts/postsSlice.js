@@ -7,10 +7,11 @@ const initialReaction = {
 	rocket: 0,
 	eyes: 0,
 }
-const initialState = [
-	{ id: '1', title: 'First Post!', content: 'Hello!', user: '1', date: new Date().toISOString(), reactions: initialReaction, },
-	{ id: '2', title: 'Second Post', content: 'More text', user: '2', date: new Date().toISOString(), reactions: initialReaction, },
-];
+const initialState = {
+	posts: [],
+	status: 'idle',
+	error: null,
+}
 
 const postsSlice = createSlice({
 	name: 'posts',
@@ -18,7 +19,7 @@ const postsSlice = createSlice({
 	reducers: {
 		postAdded: {
 			reducer(state, action) {
-				state.push(action.payload);
+				state.posts.push(action.payload);
 			},
 			prepare(title, content, userId) {
 				return {
@@ -34,14 +35,14 @@ const postsSlice = createSlice({
 			},
 		},
 		postUpdated(state, { payload: { id, title, content } }) {
-			const existingPost = state.find(post => post.id === id);
+			const existingPost = state.posts.find(post => post.id === id);
 			if (existingPost) {
 				existingPost.title = title;
 				existingPost.content = content;
 			}
 		},
 		reactionAdded(state, { payload: { postId, reaction } }) {
-			const existingPost = state.find(post => post.id === postId);
+			const existingPost = state.posts.find(post => post.id === postId);
 			if (existingPost) existingPost.reactions[reaction]++;
 		},
 	},
@@ -49,5 +50,5 @@ const postsSlice = createSlice({
 
 export default postsSlice.reducer;
 export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions;
-export const selectAllPosts = state => state.posts;
-export const selectPostById = (state, postId) => state.posts.find(post => post.id === postId);
+export const selectAllPosts = state => state.posts.posts;
+export const selectPostById = (state, postId) => state.posts.posts.find(post => post.id === postId);
