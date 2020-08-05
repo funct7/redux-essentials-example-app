@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
 
-import { postAdded } from './postsSlice';
+import { addNewPost } from './postsSlice';
 
 export const AddPostForm = () => {
 	// ??: How do components know about the state? Where is the canonical document on what states are available?
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
 	const [userId, setUserId] = useState('');
+	const [isUploading, setIsUploading] = useState(false);
 
 	const dispatch = useDispatch();
 	const users = useSelector(state => state.users);
@@ -16,14 +18,23 @@ export const AddPostForm = () => {
 	const onContentChanged = e => setContent(e.target.value);
 	const onAuthorChanged = e => setUserId(e.target.value)
 
-	const onSavePostClicked = () => {
-		if (!title || !content) return;
-		dispatch(postAdded(title, content, userId));
-		setTitle('');
-		setContent('');
-	};
+	const canSave = Boolean(title) && Boolean(content) && Boolean(userId) && !isUploading;
 
-	const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
+	const onSavePostClicked = async () => { 
+		if (!canSave) return;
+		try { 
+			setIsUploading(true);
+			const resultAction = await dispatch(addNewPost({ title, content, user: userId }));
+			unwrapResult(resultAction);
+			setTitle('');
+			setContent('');
+			setUserId('');
+		} catch (e) { 
+			console.error(`an error occurred: ${e}`);
+		} finally { 
+			setIsUploading(false);
+		}
+	};
 
 	const userOptions = users.map(user => (
 		<option key={user.id} value={user.id}>{user.name}</option>
