@@ -9,7 +9,7 @@ export const EditPostForm = ({ match }) => {
 
 	// Note: If post object changes, all components will have to make adjusting changes
 	// Note: Notice how this form is almost identical to the AddPostForm, but has to build everything from scratch.
-	const post = useSelector(selectPostById(postId));
+	const post = useSelector(state => selectPostById(state, postId));
 
 	const [title, setTitle] = useState(post.title);
 	const [content, setContent] = useState(post.content);

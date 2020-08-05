@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { unwrapResult } from '@reduxjs/toolkit';
 
 import { addNewPost } from './postsSlice';
+import { selectAllUsers } from '../users/usersSlice';
 
 export const AddPostForm = () => {
 	// ??: How do components know about the state? Where is the canonical document on what states are available?
@@ -12,7 +13,7 @@ export const AddPostForm = () => {
 	const [isUploading, setIsUploading] = useState(false);
 
 	const dispatch = useDispatch();
-	const users = useSelector(state => state.users);
+	const users = useSelector(selectAllUsers);
 
 	const onTitleChanged = e => setTitle(e.target.value);
 	const onContentChanged = e => setContent(e.target.value);
