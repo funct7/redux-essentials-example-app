@@ -4,7 +4,7 @@ import { client } from '../../api/client';
 
 const initialState = [];
 
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => { 
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
 	const response = await client.get('/fakeApi/users');
 	return response.users;
 });
@@ -14,10 +14,12 @@ const usersSlice = createSlice({
 	initialState,
 	reducers: {},
 	extraReducers: {
-		[fetchUsers.fulfilled]: (state, { payload }) => { 
+		[fetchUsers.fulfilled]: (state, { payload }) => {
 			return payload;
 		},
 	}
 });
 
 export default usersSlice.reducer;
+export const selectAllUsers = state => state.users;
+export const selectUserById = userId => state => state.users.find(user => user.id === userId);
