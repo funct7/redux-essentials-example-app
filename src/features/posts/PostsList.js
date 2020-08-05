@@ -1,35 +1,41 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { PostAuthor } from './PostAuthor';
-import { TimeAgo } from './TimeAgo';
-import { ReactionButtons } from './ReactionButtons';
-import { selectAllPosts } from './postsSlice';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAllPosts, fetchPosts } from './postsSlice';
+import { PostExcerpt } from './PostExcerpt';
 
 export const PostsList = () => {
+	const dispatch = useDispatch();
 	const posts = useSelector(selectAllPosts);
-	const orderedPosts = posts.slice().sort((lhs, rhs) => rhs.date.localeCompare(lhs.date));
+	const postStatus = useSelector(state => state.posts.status);
+	const error = useSelector(state => state.posts.error);
 
-	// ??: How do components know about the state? Where is the canonical document on what states are available?
-	const renderedPosts = orderedPosts.map(post => (
-		<article className="post-excerpt">
-			<h3>{post.title}</h3>
-			<div>
-				<PostAuthor userId={post.user} />
-				<TimeAgo timestamp={post.date} />
-			</div>
-			<p>{post.content.substring(0, 100)}</p>
-			<ReactionButtons post={post} />
-			<Link to={`/posts/${post.id}`} className="button muted-button">
-				View Post
-			</Link>
-		</article>
-	));
+	useEffect(() => {
+		if (postStatus === 'idle') dispatch(fetchPosts());
+	}, [postStatus, dispatch]);
+
+	let content;
+
+	switch (postStatus) {
+		case 'loading': {
+			content = <div className="loader">Loading...</div>
+			break;
+		}
+		case 'succeeded': {
+			const orderedPosts = posts.slice().sort((lhs, rhs) => rhs.date.localeCompare(lhs.date));
+			// ??: How do components know about the state? Where is the canonical document on what states are available?
+			content = orderedPosts.map(post => (<PostExcerpt key={post.id} post={post} />));
+			break;
+		}
+		case 'failed': {
+			content = <div>{error}</div>
+		}
+	}
+
 
 	return (
-		<section>
+		<section className="posts-list">
 			<h2>Posts</h2>
-			{renderedPosts}
+			{content}
 		</section>
 	);
 };
