@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectAllPosts, fetchPosts } from './postsSlice';
 import { PostExcerpt } from './PostExcerpt';
 
+const MemoizedPostExcerpt = React.memo(PostExcerpt);
+
 export const PostsList = () => {
 	const dispatch = useDispatch();
 	const posts = useSelector(selectAllPosts);
@@ -23,7 +25,7 @@ export const PostsList = () => {
 		case 'succeeded': {
 			const orderedPosts = posts.slice().sort((lhs, rhs) => rhs.date.localeCompare(lhs.date));
 			// ??: How do components know about the state? Where is the canonical document on what states are available?
-			content = orderedPosts.map(post => (<PostExcerpt key={post.id} post={post} />));
+			content = orderedPosts.map(post => (<MemoizedPostExcerpt key={post.id} post={post} />));
 			break;
 		}
 		case 'failed': {
