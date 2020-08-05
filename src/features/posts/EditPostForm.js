@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { postUpdated } from './postsSlice';
+import { postUpdated, selectPostById } from './postsSlice';
 
 export const EditPostForm = ({ match }) => {
 	const { postId } = match.params;
 
 	// Note: If post object changes, all components will have to make adjusting changes
 	// Note: Notice how this form is almost identical to the AddPostForm, but has to build everything from scratch.
-	const post = useSelector(state => state.posts.find(post => post.id === postId));
+	const post = useSelector(selectPostById);
 
 	const [title, setTitle] = useState(post.title);
 	const [content, setContent] = useState(post.content);
